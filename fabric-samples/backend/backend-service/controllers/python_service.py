@@ -16,7 +16,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 
 
-csv_file = './backend/backend-service/retrieved_data_set.csv'
+home_directory = os.path.expanduser('~')
+csv_file = os.path.join(home_directory, 'fabric-federated-ml-client-network', 'fabric-samples', 'backend', 'backend-service', 'retrieved_data_set.csv')
 data = pd.read_csv(csv_file)
 a = data.isnull().sum()
 b = a.sort_values(ascending=False)

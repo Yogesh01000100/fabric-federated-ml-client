@@ -11,14 +11,17 @@ import csvWriter from "csv-write-stream";
 const homeDirectory = os.homedir();
 const client = create();
 
-function pythonFunction(jsonData) {
+function pythonFunction() {
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn("python", [
       `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/controllers/python_service.py`,
     ]);
 
+    let scriptOutput = '';
+
     pythonProcess.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
+      scriptOutput += data.toString();  // Collect data from stdout
     });
 
     pythonProcess.stderr.on('data', (data) => {
@@ -31,12 +34,9 @@ function pythonFunction(jsonData) {
         console.log(`Python script exited with code ${code}`);
         reject(`Python script exited with code ${code}`);
       } else {
-        const filePath = `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/encrypted_data.dat`;
-        resolve(filePath);
+        resolve(scriptOutput);
       }
     });
-    pythonProcess.stdin.write(jsonData);
-    pythonProcess.stdin.end();
   });
 }
 
@@ -137,6 +137,23 @@ async function fetchContentFromIPFS(cid) {
   }
   return Buffer.concat(data);
 }
+
+export const processData = async (req, res) => {
+  try {
+    const result = await pythonFunction();
+    res.status(200).json({
+      success: true,
+      message: result
+    });
+  } catch (error) {
+    console.error('Failed to execute Python script:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to execute Python script',
+      error: error.toString()
+    });
+  }
+};
 
 
 export const getHospitalRole10 = async (req, res) => {

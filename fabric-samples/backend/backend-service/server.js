@@ -50,6 +50,7 @@ const startServer = async () => {
       },
       //{ path: "/fetch-record", controllerMethod: "FetchEHR" },
       { path: "/fetch-all-records", controllerMethod: "FetchAllRecords" },
+      { path: "/train-data", controllerMethod: "processData" }
     ];
 
     routes.forEach(({ path, cacheTime, controllerMethod }) => {
