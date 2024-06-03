@@ -6,3 +6,4 @@
 /kubo
 *.log
 **/retrieved_data_set.csv
+**/response.txt

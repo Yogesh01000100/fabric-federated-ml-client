@@ -4,6 +4,9 @@
 - Python ==3.10.x
 - Git
 
+### Clone repository in /home
+- git clone https://github.com/Yogesh01000100/fabric-federated-ml-client-network.git
+
 ## Docker steps:
 
 ```bash
@@ -42,6 +45,9 @@ chmod +x __.sh first time
 ```
 ```bash
 npm run install-deps
+```
+```bash
+./enroll-admin.sh
 ```
 ```bash
 ./create-ipfs-service.sh
