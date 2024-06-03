@@ -1,0 +1,12 @@
+{
+  "name": "fabric-intrachain-client-network-analytics",
+  "version": "1.0.0",
+  "description": "client - X",
+  "main": "index.js",
+  "scripts": {
+    "install-deps": "npm --prefix backend/application-javascript install backend/application-javascript && npm --prefix backend/backend-service install backend/backend-service"
+  },  
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

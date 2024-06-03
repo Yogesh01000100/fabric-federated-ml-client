@@ -1,0 +1,16 @@
+{
+  "name": "kubo",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "kubo-rpc-client": "^4.1.1"
+  }
+}

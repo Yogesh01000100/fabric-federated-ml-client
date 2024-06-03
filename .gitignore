@@ -1,0 +1,8 @@
+**/node_modules/
+*package-lock.json
+*.tenseal
+*.dat
+*.gz
+/kubo
+*.log
+**/retrieved_data_set.csv
