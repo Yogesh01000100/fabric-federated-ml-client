@@ -14,7 +14,7 @@ const client = create();
 function pythonFunction(jsonData) {
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn("python", [
-      `${homeDirectory}/fabric-intrachain-client-network-analytics/fabric-samples/backend/backend-service/controllers/python_service.py`,
+      `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/controllers/python_service.py`,
     ]);
 
     pythonProcess.stdout.on('data', (data) => {
@@ -31,7 +31,7 @@ function pythonFunction(jsonData) {
         console.log(`Python script exited with code ${code}`);
         reject(`Python script exited with code ${code}`);
       } else {
-        const filePath = `${homeDirectory}/fabric-intrachain-client-network-analytics/fabric-samples/backend/backend-service/encrypted_data.dat`;
+        const filePath = `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/encrypted_data.dat`;
         resolve(filePath);
       }
     });
@@ -44,7 +44,7 @@ export const uploadEHR = async (req, res) => {
   try {
       const channelName = "mychannel";
       const chaincodeName = "basic";
-      const filePath = `${homeDirectory}/fabric-intrachain-client-network-analytics/fabric-samples/backend/backend-service/controllers/dataset.csv`;
+      const filePath = `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/controllers/dataset.csv`;
       const gateway = gateways["admin"];
 
       const network = await gateway.getNetwork(channelName);
