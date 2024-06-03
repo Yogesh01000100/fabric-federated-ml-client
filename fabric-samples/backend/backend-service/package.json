@@ -1,0 +1,31 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "sample",
+    "type": "module",
+    "engines": {
+        "node": ">=14.14",
+        "npm": ">=6"
+    },
+    "scripts": {
+        "dev": "nodemon server.js"
+    },
+    "engineStrict": true,
+    "author": "Hyperledger",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "axios": "^1.6.8",
+        "csv-parser": "^3.0.0",
+        "csv-write-stream": "^2.0.0",
+        "express": "^4.17.1",
+        "fabric-ca-client": "^2.2.19",
+        "fabric-network": "^2.2.19",
+        "kubo-rpc-client": "^4.1.1",
+        "memory-cache": "^0.2.0",
+        "mongoose": "^8.2.2"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "nodemon": "^3.1.0"
+    }
+}
