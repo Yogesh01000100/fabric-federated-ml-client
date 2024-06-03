@@ -41,6 +41,9 @@ chmod +x __.sh first time
 ./create-network.sh
 ```
 ```bash
+npm run install-deps
+```
+```bash
 ./create-ipfs-service.sh
 ```
 ```bash
