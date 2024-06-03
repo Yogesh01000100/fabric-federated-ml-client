@@ -64,14 +64,12 @@ export const uploadEHR = async (req, res) => {
             const { cid } = await client.add(fileBuffer);
             console.log(`Data for ${patientId} added to IPFS with CID: ${cid}`);
 
-            // Prepare the data to store in the blockchain
             const patientData = {
                 disease: {
                     diabetes: cid.toString()  // Adding the disease tag with IPFS CID
                 }
             };
-
-            // Store the structured data in the blockchain
+            
             await contract.submitTransaction('UploadEHR', patientId, JSON.stringify(patientData));
 
             return { patientId, cid: cid.toString() };

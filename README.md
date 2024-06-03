@@ -55,3 +55,8 @@ npm run install-deps
 ```bash
 sudo systemctl start ipfs-node.service  # (start the ipfs node)
 ```
+
+## Status Checks
+
+- http://localhost:5984/_utils/
+- http://127.0.0.1:5001/webui
