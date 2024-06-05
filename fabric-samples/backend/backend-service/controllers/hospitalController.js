@@ -13,28 +13,19 @@ const client = create();
 
 function pythonFunction() {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", [
+    const border = '#################################################################';
+    const pythonProcess = spawn("python3", [
       `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/python_service.py`,
     ]);
 
-    let scriptOutput = '';
-
-    pythonProcess.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-      scriptOutput += data.toString();  // Collect data from stdout
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-      reject(data.toString());
-    });
-
     pythonProcess.on('close', (code) => {
       if (code !== 0) {
-        console.log(`Python script exited with code ${code}`);
         reject(`Python script exited with code ${code}`);
       } else {
-        resolve(scriptOutput);
+        console.log(border);
+        console.log('#---------------------- DGX server response---------------------#');
+        console.log(border);
+        resolve('Python script called successfully.');
       }
     });
   });
