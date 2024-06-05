@@ -4,7 +4,7 @@
   "description": "client - X",
   "main": "index.js",
   "scripts": {
-    "install-deps": "npm --prefix fabric-samples/backend/application-javascript install && npm --prefix fabric-samples/backend/backend-service install"
+    "configure": "npm --prefix fabric-samples/backend/application-javascript install && npm --prefix fabric-samples/backend/backend-service install"
   },  
   "keywords": [],
   "author": "",
