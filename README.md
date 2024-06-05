@@ -17,9 +17,6 @@ sudo apt-get update
 ```bash
 sudo apt install docker.io
 ```
-```bash
-sudo groupadd docker
-```
 ```bash  
 sudo usermod -aG docker $USER    # (restart the PC after this step)
 ```
