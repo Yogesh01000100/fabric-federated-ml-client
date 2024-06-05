@@ -14,7 +14,7 @@ const client = create();
 function pythonFunction() {
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn("python", [
-      `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/controllers/python_service.py`,
+      `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/python_service.py`,
     ]);
 
     let scriptOutput = '';
@@ -44,7 +44,7 @@ export const uploadEHR = async (req, res) => {
   try {
       const channelName = "mychannel";
       const chaincodeName = "basic";
-      const filePath = `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/backend/backend-service/controllers/dataset.csv`;
+      const filePath = `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/dataset.csv`;
       const gateway = gateways["admin"];
 
       const network = await gateway.getNetwork(channelName);

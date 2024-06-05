@@ -1,5 +1,5 @@
 {
-  "name": "fabric-federated-ml-client-network",
+  "name": "fabric-federated-ml-client",
   "version": "1.0.0",
   "description": "client - X",
   "main": "index.js",

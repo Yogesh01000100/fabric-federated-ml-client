@@ -9,7 +9,7 @@ const homeDirectory = os.homedir();
 const gateways = {};
 
 export const initializeGateways = async (userIds) => {
-    const ccpPath = `${homeDirectory}/fabric-federated-ml-client-network/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json`;
+    const ccpPath = `${homeDirectory}/fabric-federated-ml-client/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json`;
     const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
