@@ -1,0 +1,11 @@
+### Fetch Train Data
+GET http://localhost:3010/train-data
+Accept: application/json
+
+### Fetch All Records
+GET http://localhost:3010/fetch-all-records
+Accept: application/json
+
+### Upload EHR
+POST http://localhost:3010/uploadEHR
+Content-Type: application/json

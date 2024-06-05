@@ -4,6 +4,7 @@
 - Python 3.10.x
 - Git
 - Curl
+- "REST Client" extension by Huachao Mao.
 
 ### Clone repository in /home
 - git clone https://github.com/Yogesh01000100/fabric-federated-ml-client.git
