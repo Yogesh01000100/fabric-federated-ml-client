@@ -24,15 +24,17 @@ b = a.sort_values(ascending=False)
 
 scaler = StandardScaler()
 train_data = data.to_numpy()
-train_data[:, :8] = scaler.fit_transform(train_data[:, :8])
+train_data[:, 1:15] = scaler.fit_transform(train_data[:, 1:15])
 
-X = train_data[:, [0, 1, 5, 7]]
-Y = pd.get_dummies(train_data[:, 8])
+X = train_data[:, 1:14]
+Y = pd.get_dummies(train_data[:, 15])
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.4, random_state=10)
 model = Sequential()
-model.add(Dense(12, input_dim=X_train.shape[1], activation='relu'))
-model.add(Dense(10, activation='relu'))
-model.add(Dense(2, activation='softmax'))
+model.add(Dense(14, input_dim=X_train.shape[1], activation='relu'))
+model.add(Dense(14, activation='relu'))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(4, activation='relu'))
+model.add(Dense(2, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.summary()
 checkpoint_path = "training_1/blk-cp.weights.h5"

@@ -15,7 +15,7 @@ function pythonFunction() {
   return new Promise((resolve, reject) => {
     const border = '#################################################################';
     const pythonProcess = spawn("python3", [
-      `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/python_service.py`,
+      `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/blk-client-1.py`,
     ]);
 
     pythonProcess.on('close', (code) => {
@@ -33,25 +33,25 @@ function pythonFunction() {
 
 export const uploadEHR = async (req, res) => {
   try {
-      const channelName = "mychannel";
-      const chaincodeName = "basic";
-      const filePath = `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/dataset.csv`;
-      const gateway = gateways["admin"];
+    const channelName = "mychannel";
+    const chaincodeName = "basic";
+    const filePath = `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/Diabetes_Classification_1_1000.csv`;
+    const gateway = gateways["admin"];
 
-      const network = await gateway.getNetwork(channelName);
-      const contract = network.getContract(chaincodeName);
+    const network = await gateway.getNetwork(channelName);
+    const contract = network.getContract(chaincodeName);
 
-      const results = [];
+    const results = [];
 
-      fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (data) => results.push(data))
-        .on('end', async () => {
-          const updatePromises = results.map(async (record, index) => {
-            const patientId = `patient_${index + 1}`;
-            const fileBuffer = Buffer.from(JSON.stringify(record));
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (data) => results.push(data))
+      .on('end', async () => {
+        const updatePromises = results.map(async (record, index) => {
+          const patientId = `patient_${parseInt(record.Patient_ID, 10) + 1}`;
+          const fileBuffer = Buffer.from(JSON.stringify(record), 'utf-8');
 
-            // Add to IPFS
+          try {
             const { cid } = await client.add(fileBuffer);
             console.log(`Data for ${patientId} added to IPFS with CID: ${cid}`);
 
@@ -60,22 +60,26 @@ export const uploadEHR = async (req, res) => {
                     diabetes: cid.toString()  // Adding the disease tag with IPFS CID
                 }
             };
-            
+
             await contract.submitTransaction('UploadEHR', patientId, JSON.stringify(patientData));
-
             return { patientId, cid: cid.toString() };
-          });
-
-          const updates = await Promise.all(updatePromises);
-          res.json({
-            success: true,
-            updates: updates,
-            message: "All data uploaded successfully!"
-          });
+          } catch (ipfsError) {
+            console.error(`IPFS error for patient ${patientId}: ${ipfsError.message}`);
+            return null;
+          }
         });
+
+        const updates = await Promise.all(updatePromises);
+        const successfulUpdates = updates.filter(update => update != null);
+        res.json({
+          success: true,
+          updates: successfulUpdates,
+          message: "All data uploaded successfully!"
+        });
+      });
   } catch (error) {
-      console.error(`Error: ${error}`);
-      res.status(500).json({ error: error.message });
+    console.error(`Error: ${error}`);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -83,7 +87,7 @@ export const uploadEHR = async (req, res) => {
 export const FetchAllRecords = async (req, res) => {
   const channelName = "mychannel";
   const chaincodeName = "basic";
-  const gateway = gateways["admin"]; //  admin access
+  const gateway = gateways["admin"];
 
   try {
     const network = await gateway.getNetwork(channelName);
@@ -94,12 +98,20 @@ export const FetchAllRecords = async (req, res) => {
     const fetchedRecords = [];
 
     for (const record of resultsJson) {
-      const cid = record.disease.diabetes; // Correct path according to the new schema
-      const fileContent = await fetchContentFromIPFS(cid); // fetchContentFromIPFS needs to be defined
-      fetchedRecords.push(JSON.parse(fileContent.toString()));
+      const cid = record.disease.diabetes;
+      try {
+        const fileContent = await fetchContentFromIPFS(cid);
+        const recordData = JSON.parse(fileContent.toString());
+        fetchedRecords.push(recordData);
+      } catch (fetchError) {
+        console.error(`Failed to fetch or parse content for CID ${cid}: ${fetchError.message}`);
+      }
     }
 
-    const fields = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']; // Modify based on actual fields
+    // Sort records by Patient_ID before writing to CSV
+    fetchedRecords.sort((a, b) => parseInt(a.Patient_ID) - parseInt(b.Patient_ID));
+
+    const fields = ["Patient_ID", "Cholesterol", "Glucose", "HDL_Chol", "Chol/HDL ratio", "Age", "Gender", "Height", "Weight", "BMI", "Systolic BP", "Diastolic BP", "waist", "hip", "Waist/hip ratio", "Diabetes"];
     const csvFilePath = './retrieved_data_set.csv';
     const writer = csvWriter({ headers: fields });
     writer.pipe(fs.createWriteStream(csvFilePath));
@@ -115,11 +127,12 @@ export const FetchAllRecords = async (req, res) => {
       message: "All diabetes records retrieved successfully, with detailed data from IPFS!",
       filePath: csvFilePath
     });
-  } catch ( error) {
+  } catch (error) {
     console.error(`Failed to retrieve diabetes records: ${error}`);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 async function fetchContentFromIPFS(cid) {
   const data = [];
@@ -128,6 +141,7 @@ async function fetchContentFromIPFS(cid) {
   }
   return Buffer.concat(data);
 }
+
 
 export const processData = async (req, res) => {
   try {
