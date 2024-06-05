@@ -5,8 +5,8 @@ echo "System Information:"
 uname -a
 
 # Download and install IPFS
-echo "Downloading IPFS..."
-wget https://dist.ipfs.tech/kubo/v0.28.0/kubo_v0.28.0_linux-amd64.tar.gz
+#echo "Downloading IPFS..."
+#wget https://dist.ipfs.tech/kubo/v0.28.0/kubo_v0.28.0_linux-amd64.tar.gz
 echo "Extracting IPFS..."
 tar -xvf kubo_v0.28.0_linux-amd64.tar.gz
 
