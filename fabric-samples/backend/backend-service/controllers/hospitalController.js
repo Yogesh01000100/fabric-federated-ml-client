@@ -2,40 +2,42 @@ import { gateways } from "../network/fabricNetwork.js";
 import { create } from "kubo-rpc-client";
 import { spawn } from "child_process";
 import axios from "axios";
-import fs from 'fs';
-import os from 'os';
-import csv from 'csv-parser';
+import fs from "fs";
+import os from "os";
+import csv from "csv-parser";
 import csvWriter from "csv-write-stream";
-
 
 const homeDirectory = os.homedir();
 const client = create();
 
 function pythonFunction() {
   return new Promise((resolve, reject) => {
-      const border = '#################################################################';
-      const pythonProcess = spawn("python3", [
-        `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/blk-client-1.py`,
-      ]);
-  
-      pythonProcess.stdout.on('data', (data) => {
-          console.log(`stdout: ${data.toString()}`);
-      });
+    const border =
+      "#################################################################";
+    const pythonProcess = spawn("python3", [
+      `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/blk-client-1.py`,
+    ]);
 
-      pythonProcess.stderr.on('data', (data) => {
-          console.error(`stderr: ${data.toString()}`);
-      });
+    pythonProcess.stdout.on("data", (data) => {
+      console.log(border);
+      console.log(
+        "#---------------------- DGX server response---------------------#"
+      );
+      console.log(border);
+      console.log(`stdout: ${data.toString()}`);
+    });
 
-      pythonProcess.on('close', (code) => {
-          if (code !== 0) {
-              reject(`Python script exited with code ${code}`);
-          } else {
-              console.log(border);
-              console.log('#---------------------- DGX server response---------------------#');
-              console.log(border);
-              resolve('Python script called successfully.');
-          }
-      });
+    pythonProcess.stderr.on("data", (data) => {
+      console.error(`stderr: ${data.toString()}`);
+    });
+
+    pythonProcess.on("close", (code) => {
+      if (code !== 0) {
+        reject(`Python script exited with code ${code}`);
+      } else {
+        resolve("Python script called successfully.");
+      }
+    });
   });
 }
 
@@ -53,36 +55,42 @@ export const uploadEHR = async (req, res) => {
 
     fs.createReadStream(filePath)
       .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', async () => {
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
         const updatePromises = results.map(async (record, index) => {
           const patientId = `patient_${parseInt(record.Patient_ID, 10) + 1}`;
-          const fileBuffer = Buffer.from(JSON.stringify(record), 'utf-8');
+          const fileBuffer = Buffer.from(JSON.stringify(record), "utf-8");
 
           try {
             const { cid } = await client.add(fileBuffer);
             console.log(`Data for ${patientId} added to IPFS with CID: ${cid}`);
 
             const patientData = {
-                disease: {
-                    diabetes: cid.toString()  // Adding the disease tag with IPFS CID
-                }
+              disease: {
+                diabetes: cid.toString(), // Adding the disease tag with IPFS CID
+              },
             };
 
-            await contract.submitTransaction('UploadEHR', patientId, JSON.stringify(patientData));
+            await contract.submitTransaction(
+              "UploadEHR",
+              patientId,
+              JSON.stringify(patientData)
+            );
             return { patientId, cid: cid.toString() };
           } catch (ipfsError) {
-            console.error(`IPFS error for patient ${patientId}: ${ipfsError.message}`);
+            console.error(
+              `IPFS error for patient ${patientId}: ${ipfsError.message}`
+            );
             return null;
           }
         });
 
         const updates = await Promise.all(updatePromises);
-        const successfulUpdates = updates.filter(update => update != null);
+        const successfulUpdates = updates.filter((update) => update != null);
         res.json({
           success: true,
           updates: successfulUpdates,
-          message: "All data uploaded successfully!"
+          message: "All data uploaded successfully!",
         });
       });
   } catch (error) {
@@ -90,7 +98,6 @@ export const uploadEHR = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const FetchAllRecords = async (req, res) => {
   const channelName = "mychannel";
@@ -112,19 +119,40 @@ export const FetchAllRecords = async (req, res) => {
         const recordData = JSON.parse(fileContent.toString());
         fetchedRecords.push(recordData);
       } catch (fetchError) {
-        console.error(`Failed to fetch or parse content for CID ${cid}: ${fetchError.message}`);
+        console.error(
+          `Failed to fetch or parse content for CID ${cid}: ${fetchError.message}`
+        );
       }
     }
 
     // Sort records by Patient_ID before writing to CSV
-    fetchedRecords.sort((a, b) => parseInt(a.Patient_ID) - parseInt(b.Patient_ID));
+    fetchedRecords.sort(
+      (a, b) => parseInt(a.Patient_ID) - parseInt(b.Patient_ID)
+    );
 
-    const fields = ["Patient_ID", "Cholesterol", "Glucose", "HDL_Chol", "Chol/HDL ratio", "Age", "Gender", "Height", "Weight", "BMI", "Systolic BP", "Diastolic BP", "waist", "hip", "Waist/hip ratio", "Diabetes"];
-    const csvFilePath = './retrieved_data_set.csv';
+    const fields = [
+      "Patient_ID",
+      "Cholesterol",
+      "Glucose",
+      "HDL_Chol",
+      "Chol/HDL ratio",
+      "Age",
+      "Gender",
+      "Height",
+      "Weight",
+      "BMI",
+      "Systolic BP",
+      "Diastolic BP",
+      "waist",
+      "hip",
+      "Waist/hip ratio",
+      "Diabetes",
+    ];
+    const csvFilePath = "./retrieved_data_set.csv";
     const writer = csvWriter({ headers: fields });
     writer.pipe(fs.createWriteStream(csvFilePath));
 
-    fetchedRecords.forEach(record => {
+    fetchedRecords.forEach((record) => {
       writer.write(record);
     });
 
@@ -132,15 +160,15 @@ export const FetchAllRecords = async (req, res) => {
 
     res.json({
       success: true,
-      message: "All diabetes records retrieved successfully, with detailed data from IPFS!",
-      filePath: csvFilePath
+      message:
+        "All diabetes records retrieved successfully, with detailed data from IPFS!",
+      filePath: csvFilePath,
     });
   } catch (error) {
     console.error(`Failed to retrieve diabetes records: ${error}`);
     res.status(500).json({ error: error.message });
   }
 };
-
 
 async function fetchContentFromIPFS(cid) {
   const data = [];
@@ -150,24 +178,22 @@ async function fetchContentFromIPFS(cid) {
   return Buffer.concat(data);
 }
 
-
 export const processData = async (req, res) => {
   try {
     const result = await pythonFunction();
     res.status(200).json({
       success: true,
-      message: result
+      message: result,
     });
   } catch (error) {
-    console.error('Failed to execute Python script:', error);
+    console.error("Failed to execute Python script:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to execute Python script',
-      error: error.toString()
+      message: "Failed to execute Python script",
+      error: error.toString(),
     });
   }
 };
-
 
 export const getHospitalRole10 = async (req, res) => {
   const channelName = "mychannel";
