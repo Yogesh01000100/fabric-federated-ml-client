@@ -29,6 +29,6 @@ sudo sysctl -p
 # Remove downloaded and extracted IPFS files (assuming script is run from the directory where files were downloaded)
 echo "Removing downloaded IPFS files..."
 rm -rf kubo*
-rm kubo_v0.28.0_linux-amd64.tar.gz
+#rm kubo_v0.28.0_linux-amd64.tar.gz
 
 echo "Cleanup complete."

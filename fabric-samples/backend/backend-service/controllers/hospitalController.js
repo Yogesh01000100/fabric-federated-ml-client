@@ -13,21 +13,29 @@ const client = create();
 
 function pythonFunction() {
   return new Promise((resolve, reject) => {
-    const border = '#################################################################';
-    const pythonProcess = spawn("python3", [
-      `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/blk-client-1.py`,
-    ]);
+      const border = '#################################################################';
+      const pythonProcess = spawn("python3", [
+        `${homeDirectory}/fabric-federated-ml-client/fabric-samples/backend/backend-service/controllers/blk-client-1.py`,
+      ]);
+  
+      pythonProcess.stdout.on('data', (data) => {
+          console.log(`stdout: ${data.toString()}`);
+      });
 
-    pythonProcess.on('close', (code) => {
-      if (code !== 0) {
-        reject(`Python script exited with code ${code}`);
-      } else {
-        console.log(border);
-        console.log('#---------------------- DGX server response---------------------#');
-        console.log(border);
-        resolve('Python script called successfully.');
-      }
-    });
+      pythonProcess.stderr.on('data', (data) => {
+          console.error(`stderr: ${data.toString()}`);
+      });
+
+      pythonProcess.on('close', (code) => {
+          if (code !== 0) {
+              reject(`Python script exited with code ${code}`);
+          } else {
+              console.log(border);
+              console.log('#---------------------- DGX server response---------------------#');
+              console.log(border);
+              resolve('Python script called successfully.');
+          }
+      });
   });
 }
 
